@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grammar", "grammar\grammar.csproj", "{B8A40708-9B92-4964-9B62-02B992A1E885}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grammar-test", "grammar-test\grammar-test.csproj", "{5480A1F0-5B93-41A9-9F64-90352F0315C4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8A40708-9B92-4964-9B62-02B992A1E885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A40708-9B92-4964-9B62-02B992A1E885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A40708-9B92-4964-9B62-02B992A1E885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A40708-9B92-4964-9B62-02B992A1E885}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5480A1F0-5B93-41A9-9F64-90352F0315C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5480A1F0-5B93-41A9-9F64-90352F0315C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5480A1F0-5B93-41A9-9F64-90352F0315C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5480A1F0-5B93-41A9-9F64-90352F0315C4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
