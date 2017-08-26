@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grammar", "grammar\grammar.csproj", "{B8A40708-9B92-4964-9B62-02B992A1E885}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "grammar", "grammar\grammar.csproj", "{B8A40708-9B92-4964-9B62-02B992A1E885}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grammar-test", "grammar-test\grammar-test.csproj", "{5480A1F0-5B93-41A9-9F64-90352F0315C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "grammar-test", "grammar-test\grammar-test.csproj", "{5480A1F0-5B93-41A9-9F64-90352F0315C4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test", "test\test.csproj", "{ABD2448E-95A7-4175-A657-6757B0179ADE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,15 @@ Global
 		{5480A1F0-5B93-41A9-9F64-90352F0315C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5480A1F0-5B93-41A9-9F64-90352F0315C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5480A1F0-5B93-41A9-9F64-90352F0315C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABD2448E-95A7-4175-A657-6757B0179ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABD2448E-95A7-4175-A657-6757B0179ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABD2448E-95A7-4175-A657-6757B0179ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABD2448E-95A7-4175-A657-6757B0179ADE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {92FADC8F-629A-456D-B503-D8E2358A70FB}
 	EndGlobalSection
 EndGlobal

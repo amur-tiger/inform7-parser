@@ -1,9 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <RootNamespace>TigeR.Inform7</RootNamespace>
     <AssemblyName>Grammar</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Linq" Version="4.3.0" />
+  </ItemGroup>
 
 </Project>
