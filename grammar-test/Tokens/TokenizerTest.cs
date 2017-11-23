@@ -46,6 +46,19 @@ namespace TigeR.Inform7.Tokens
 		}
 
 		[Fact]
+		public void TokenizeApostrophes()
+		{
+			var result = sut.Tokenize("This can't happen.").ToList();
+
+			Check.That(result).ContainsExactly(
+				new Token("This", 0, 0, TokenType.Word),
+				new Token("can't", 0, 5, TokenType.Word),
+				new Token("happen", 0, 11, TokenType.Word),
+				new Token(".", 0, 17, TokenType.Punctuation)
+			);
+		}
+
+		[Fact]
 		public void DetectIndentation()
 		{
 			var result = sut.Tokenize("Block:\n\tThis is indented;").ToList();

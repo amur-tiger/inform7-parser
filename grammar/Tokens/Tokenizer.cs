@@ -70,7 +70,7 @@ namespace TigeR.Inform7.Tokens
 			var startLine = state.Line;
 			var startColumn = state.Column;
 
-			while (Char.IsLetterOrDigit(state.Peek) && state.Advance())
+			while ((Char.IsLetterOrDigit(state.Peek) || state.Peek == '\'') && state.Advance())
 			{
 				// intentionally empty
 			}
