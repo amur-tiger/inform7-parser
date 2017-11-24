@@ -59,6 +59,11 @@ namespace TigeR.Inform7.Ast
 					return;
 				}
 
+				if (currentRule.Name != null)
+				{
+					branch.SetName(branch.Count - 1, currentRule.Name);
+				}
+
 				branch.Last().Add(currentToken);
 				if (tokenOffset == tokens.Count - 1 && ruleOffset == rules.Count - 1)
 				{

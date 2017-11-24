@@ -8,6 +8,9 @@ namespace TigeR.Inform7.Ast
 {
     internal class Match : List<List<Token>>, IEquatable<Match>
     {
+		// todo: update when removing stuff
+		private readonly Dictionary<String, Int32> matchNames = new Dictionary<String, Int32>();
+
 		public Match() : base() { }
 
 		public Match(IEnumerable<List<Token>> list) : base(list) { }
@@ -21,6 +24,31 @@ namespace TigeR.Inform7.Ast
 			}
 
 			return result;
+		}
+
+		public List<Token> this[String name]
+		{
+			get
+			{
+				if (!matchNames.ContainsKey(name))
+				{
+					return null;
+				}
+
+				var index = matchNames[name];
+				return this[index];
+			}
+		}
+
+		public void SetName(int index, string name)
+		{
+			matchNames.Add(name, index);
+		}
+
+		public void Add(string name, List<Token> group)
+		{
+			Add(group);
+			matchNames.Add(name, Count - 1);
 		}
 
 		public override int GetHashCode()
@@ -41,6 +69,11 @@ namespace TigeR.Inform7.Ast
 			}
 
 			if (Count != other.Count)
+			{
+				return false;
+			}
+
+			if (!matchNames.SequenceEqual(other.matchNames))
 			{
 				return false;
 			}

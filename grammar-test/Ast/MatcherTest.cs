@@ -66,7 +66,7 @@ namespace TigeR.Inform7.Ast
 		public void MatchSingle()
 		{
 			var tokens = SetupTokens("Word");
-			var sut = SetupMatcher(new Rule(TokenType.Word, "Word", false));
+			var sut = SetupMatcher(new Rule(TokenType.Word, "Word"));
 
 			var result = sut.Match(tokens);
 
@@ -78,7 +78,7 @@ namespace TigeR.Inform7.Ast
 		{
 			var tokens = SetupTokens("A sentence.");
 			var sut = SetupMatcher(
-				new Rule(TokenType.Word, "A", false),
+				new Rule(TokenType.Word, "A"),
 				new Rule(TokenType.Word),
 				new Rule(TokenType.Punctuation));
 
@@ -131,6 +131,25 @@ namespace TigeR.Inform7.Ast
 			var result = sut.Match(tokens);
 
 			Check.That(result).IsEmpty();
+		}
+
+		[Fact]
+		public void AssignNamedMatches()
+		{
+			var tokens = SetupTokens("The variable is twelve.");
+			var match = Match(tokens, 2, 1, 1, 1);
+			match.SetName(0, "var");
+			match.SetName(2, "value");
+
+			var sut = SetupMatcher(
+				new Rule(TokenType.Word, true, "var"),
+				new Rule(TokenType.Word, "is"),
+				new Rule(TokenType.Word, true, "value"),
+				new Rule(TokenType.Punctuation));
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
 		}
     }
 }
