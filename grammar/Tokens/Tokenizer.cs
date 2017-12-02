@@ -52,6 +52,16 @@ namespace TigeR.Inform7.Tokens
 							yield return token;
 						}
 						break;
+					case '(':
+						if (state.Peek == '-')
+						{
+							foreach (var token in ReadInform6Block(state))
+							{
+								yield return token;
+							}
+							break;
+						}
+						goto default;
 					default:
 						foreach (var token in ReadWord(state))
 						{
@@ -101,7 +111,8 @@ namespace TigeR.Inform7.Tokens
 						commentStack -= 1;
 						if (commentStack == 0)
 						{
-							yield return new Token(state.Text.Substring(startPosition, state.Position - startPosition + 1), startLine, startColumn, TokenType.Comment);
+							yield return new Token(state.Text.Substring(startPosition, state.Position - startPosition + 1),
+								startLine, startColumn, TokenType.Comment);
 							yield break;
 						}
 						break;
@@ -200,6 +211,28 @@ namespace TigeR.Inform7.Tokens
 			}
 
 			throw new SyntaxException("Unterminated string literal", state.Line, state.Column);
+		}
+
+		private IEnumerable<Token> ReadInform6Block(State state)
+		{
+			Debug.Assert(state.Character == '(' && state.Peek == '-');
+
+			var startPosition = state.Position;
+			var startLine = state.Line;
+			var startColumn = state.Column;
+
+			while (state.Advance())
+			{
+				if (state.Character == '-' && state.Peek == ')')
+				{
+					state.Advance();
+					yield return new Token(state.Text.Substring(startPosition + 2, state.Position - startPosition - 3).Trim(),
+						startLine, startColumn, TokenType.Inform6);
+					yield break;
+				}
+			}
+
+			throw new SyntaxException("Unterminated Inform6 Block", state.Line, state.Column);
 		}
 	}
 }

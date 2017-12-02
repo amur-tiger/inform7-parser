@@ -237,6 +237,42 @@ namespace TigeR.Inform7.Tokens
 			);
 		}
 
+		[Fact]
+		public void DetectInform6Blocks()
+		{
+			var result = sut.Tokenize("This is (- Inform 6 Code -).").ToList();
+
+			Check.That(result).ContainsExactly(
+				new Token("This", 0, 0, TokenType.Word),
+				new Token("is", 0, 5, TokenType.Word),
+				new Token("Inform 6 Code", 0, 8, TokenType.Inform6),
+				new Token(".", 0, 27, TokenType.Punctuation)
+			);
+		}
+
+		[Fact]
+		public void UnterminatedStringCausesSyntaxException()
+		{
+			Check.ThatCode(() => sut.Tokenize("\"Unterminated").ToList())
+				.Throws<SyntaxException>();
+		}
+
+		[Fact]
+		public void UnterminatedCommentCausesSyntaxException()
+		{
+			Check.ThatCode(() => sut.Tokenize("[comment").ToList())
+				.Throws<SyntaxException>();
+		}
+
+		[Fact]
+		public void UnterminatedInform6BlockCausesSyntaxException()
+		{
+			Check.ThatCode(() => sut.Tokenize("(- inform6").ToList())
+				.Throws<SyntaxException>();
+		}
+
+		
+
 		// todo error input (tokenizer should put best effort)
 		// badly formatted input (indents, newlines)
     }

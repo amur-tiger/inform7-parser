@@ -18,5 +18,6 @@ namespace TigeR.Inform7.Tokens
 		StringVariableStart,
 		StringVariableEnd,
 		Comment,
+		Inform6
 	}
 }
