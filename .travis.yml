@@ -1,0 +1,7 @@
+language: csharp
+solution: grammar.sln
+mono: none
+dotnet: 2.0.3
+dist: trusty # build env (Ubuntu), .NET core needs at least this
+script:
+  - dotnet restore
