@@ -165,6 +165,60 @@ namespace TigeR.Inform7.Ast
 		}
 
 		[Fact]
+		public void SkipOptionalRules()
+		{
+			var tokens = SetupTokens("The thing is round.");
+			var match = Match(tokens, 2, 1, 1, 1);
+			match.SetName(0, "var");
+			match.SetName(2, "value");
+
+			var sut = SetupMatcher(
+				new Rule(TokenType.Word, true, "var"),
+				Rule.Optional(
+					new Rule(TokenType.Punctuation, "("),
+					new Rule(TokenType.Word, "called"),
+					new Rule(TokenType.Word, true, "name"),
+					new Rule(TokenType.Punctuation, ")")
+				),
+				new Rule(TokenType.Word, "is"),
+				new Rule(TokenType.Word, true, "value"),
+				new Rule(TokenType.Punctuation, ".")
+			);
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+
+		[Fact]
+		public void IncludeOptionalRules()
+		{
+			var tokens = SetupTokens("The thing (called X) is round.");
+			var match = Match(tokens, 2, 1, 1, 1, 1, 1, 1, 1);
+			match.SetName(0, "var");
+			match.SetName(3, "name");
+			match.SetName(6, "value");
+
+			var sut = SetupMatcher(
+				new Rule(TokenType.Word, true, "var"),
+				Rule.Optional(
+					new Rule(TokenType.Punctuation, "("),
+					new Rule(TokenType.Word, "called"),
+					new Rule(TokenType.Word, true, "name"),
+					new Rule(TokenType.Punctuation, ")")
+				),
+				new Rule(TokenType.Word, "is"),
+				new Rule(TokenType.Word, true, "value"),
+				new Rule(TokenType.Punctuation, ".")
+			);
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+		[Fact]
 		public void MatchWithPatternString()
 		{
 			var tokens = SetupTokens("The variable is twelve.");
@@ -178,5 +232,40 @@ namespace TigeR.Inform7.Ast
 
 			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
 		}
+
+		[Fact]
+		public void SkipOptionalInPatternString()
+		{
+			var tokens = SetupTokens("The thing is round.");
+			var match = Match(tokens, 2, 1, 1, 1);
+			match.SetName(0, "var");
+			match.SetName(2, "value");
+
+			var sut = SetupMatcher("$var [(called $name)] is $value.");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+		[Fact]
+		public void IncludeOptionalInPatternString()
+		{
+			var tokens = SetupTokens("The thing (called X) is round.");
+			var match = Match(tokens, 2, 1, 1, 1, 1, 1, 1, 1);
+			match.SetName(0, "var");
+			match.SetName(3, "name");
+			match.SetName(6, "value");
+
+			var sut = SetupMatcher("$var [(called $name)] is $value.");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+		// todo: upper/lower case matching
+		// todo: invalid patterns
+		// todo: pattern escape char
     }
 }

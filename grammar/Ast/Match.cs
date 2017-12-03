@@ -23,6 +23,11 @@ namespace TigeR.Inform7.Ast
 				result.Add(new List<Token>(group));
 			}
 
+			foreach (var name in matchNames)
+			{
+				result.SetName(name.Value, name.Key);
+			}
+
 			return result;
 		}
 
@@ -42,7 +47,7 @@ namespace TigeR.Inform7.Ast
 
 		public void SetName(int index, string name)
 		{
-			matchNames.Add(name, index);
+			matchNames[name] = index;
 		}
 
 		public void Add(string name, List<Token> group)

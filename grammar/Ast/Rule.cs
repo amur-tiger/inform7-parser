@@ -7,6 +7,31 @@ namespace TigeR.Inform7.Ast
 {
 	internal class Rule
 	{
+		internal class RuleGroup : Rule
+		{
+			public List<Rule> Rules { get; } = new List<Rule>();
+
+			public RuleGroup() : base(TokenType.Unknown) { }
+
+			public override string ToString()
+			{
+				var builder = new StringBuilder();
+				builder.Append("RuleGroup[");
+
+				foreach (var rule in Rules)
+				{
+					builder
+						.Append(rule.ToString())
+						.Append(", ");
+				}
+
+				builder.Length -= 2;
+				builder.Append("]");
+
+				return builder.ToString();
+			}
+		}
+
 		public TokenType WantedType { get; }
 		public String WantedSurface { get; }
 		public bool Repeatable { get; }
@@ -28,6 +53,13 @@ namespace TigeR.Inform7.Ast
 			WantedSurface = surface;
 			Repeatable = repeat;
 			Name = name;
+		}
+
+		public static Rule Optional(params Rule[] rules)
+		{
+			var group = new RuleGroup();
+			group.Rules.AddRange(rules);
+			return group;
 		}
 
 		public override string ToString()
