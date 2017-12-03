@@ -5,3 +5,4 @@ dotnet: 2.0.3
 dist: trusty # build env (Ubuntu), .NET core needs at least this
 script:
   - dotnet restore
+  - dotnet test grammar-test
