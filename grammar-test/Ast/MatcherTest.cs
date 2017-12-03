@@ -21,6 +21,11 @@ namespace TigeR.Inform7.Ast
 			return new Matcher(firstRule, otherRules);
 		}
 
+		private Matcher SetupMatcher(string pattern)
+		{
+			return new Matcher(pattern);
+		}
+
 		private Match Match(List<Token> tokens, params int[] length)
 		{
 			var result = new Match();
@@ -35,9 +40,16 @@ namespace TigeR.Inform7.Ast
 		}
 
 		[Fact]
-		public void RejectNullArgument()
+		public void RejectNullRuleArgument()
 		{
-			Check.ThatCode(() => SetupMatcher(null))
+			Check.ThatCode(() => SetupMatcher((Rule)null))
+				.Throws<ArgumentNullException>();
+		}
+
+		[Fact]
+		public void RejectNullPatternArgument()
+		{
+			Check.ThatCode(() => SetupMatcher((string)null))
 				.Throws<ArgumentNullException>();
 		}
 
@@ -146,6 +158,21 @@ namespace TigeR.Inform7.Ast
 				new Rule(TokenType.Word, "is"),
 				new Rule(TokenType.Word, true, "value"),
 				new Rule(TokenType.Punctuation));
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+		[Fact]
+		public void MatchWithPatternString()
+		{
+			var tokens = SetupTokens("The variable is twelve.");
+			var match = Match(tokens, 2, 1, 1, 1);
+			match.SetName(0, "var");
+			match.SetName(2, "value");
+
+			var sut = SetupMatcher("$var is $value.");
 
 			var result = sut.Match(tokens);
 

@@ -35,6 +35,37 @@ namespace TigeR.Inform7.Ast
 			rules.AddRange(otherRules);
 		}
 
+		public Matcher(string pattern)
+		{
+			// "$variable is $value."
+			// "$relationshipName relates $lhs [(called $lhsName)] to $rhs [(called $rhsName)]"
+
+			var tokenizer = new Tokenizer();
+			var tokens = tokenizer.Tokenize(pattern);
+			var variable = false;
+
+			rules = new List<Rule>();
+			foreach (var token in tokens)
+			{
+				if (token.Surface == "$")
+				{
+					variable = true;
+				}
+				else
+				{
+					if (variable)
+					{
+						rules.Add(new Rule(TokenType.Word, true, token.Surface));
+						variable = false;
+					}
+					else
+					{
+						rules.Add(new Rule(token.Type, token.Surface));
+					}
+				}
+			}
+		}
+
 		public List<Match> Match(List<Token> tokens)
 		{
 			if (tokens == null)
