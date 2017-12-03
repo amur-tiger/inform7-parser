@@ -238,6 +238,20 @@ namespace TigeR.Inform7.Tokens
 		}
 
 		[Fact]
+		public void ParsePunctuationAtStartOfString()
+		{
+			var result = sut.Tokenize("(a sentence).").ToList();
+
+			Check.That(result).ContainsExactly(
+				new Token("(", 0, 0, TokenType.Punctuation),
+				new Token("a", 0, 1, TokenType.Word),
+				new Token("sentence", 0, 3, TokenType.Word),
+				new Token(")", 0, 11, TokenType.Punctuation),
+				new Token(".", 0, 12, TokenType.Punctuation)
+			);
+		}
+
+		[Fact]
 		public void DetectInform6Blocks()
 		{
 			var result = sut.Tokenize("This is (- Inform 6 Code -).").ToList();

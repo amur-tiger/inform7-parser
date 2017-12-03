@@ -76,19 +76,27 @@ namespace TigeR.Inform7.Tokens
 		{
 			Debug.Assert(!Char.IsWhiteSpace(state.Character));
 
+			if (!Char.IsLetterOrDigit(state.Character))
+			{
+				yield return new Token(new String(state.Character, 1), state.Line, state.Column, TokenType.Punctuation);
+				yield break;
+			}
+
 			var startPosition = state.Position;
 			var startLine = state.Line;
 			var startColumn = state.Column;
 
-			while ((Char.IsLetterOrDigit(state.Peek) || state.Peek == '\'') && state.Advance())
+			while (Char.IsLetterOrDigit(state.Peek) || state.Peek == '\'')
 			{
-				// intentionally empty
+				if (!state.Advance())
+				{
+					break;
+				}
 			}
 
 			var surface = state.Text.Substring(startPosition, state.Position - startPosition + 1);
-			var type = surface.Length == 1 && !Char.IsLetterOrDigit(surface[0]) ? TokenType.Punctuation : TokenType.Word;
 
-			yield return new Token(surface, startLine, startColumn, type);
+			yield return new Token(surface, startLine, startColumn, TokenType.Word);
 		}
 
 		private IEnumerable<Token> ReadComment(State state)
