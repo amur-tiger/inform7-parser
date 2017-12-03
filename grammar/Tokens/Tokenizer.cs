@@ -94,9 +94,19 @@ namespace TigeR.Inform7.Tokens
 				}
 			}
 
-			var surface = state.Text.Substring(startPosition, state.Position - startPosition + 1);
+			if (state.Character == '\'')
+			{
+				var surface = state.Text.Substring(startPosition, state.Position - startPosition);
 
-			yield return new Token(surface, startLine, startColumn, TokenType.Word);
+				yield return new Token(surface, startLine, startColumn, TokenType.Word);
+				yield return new Token("'", state.Line, state.Column, TokenType.Punctuation);
+			}
+			else
+			{
+				var surface = state.Text.Substring(startPosition, state.Position - startPosition + 1);
+
+				yield return new Token(surface, startLine, startColumn, TokenType.Word);
+			}
 		}
 
 		private IEnumerable<Token> ReadComment(State state)

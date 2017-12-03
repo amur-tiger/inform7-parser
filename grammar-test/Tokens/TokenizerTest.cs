@@ -265,6 +265,44 @@ namespace TigeR.Inform7.Tokens
 		}
 
 		[Fact]
+		public void HandleSingleQuotesAtStartOfWord()
+		{
+			var result = sut.Tokenize("A 'B.");
+
+			Check.That(result).ContainsExactly(
+				new Token("A", 0, 0, TokenType.Word),
+				new Token("'", 0, 2, TokenType.Punctuation),
+				new Token("B", 0, 3, TokenType.Word),
+				new Token(".", 0, 4, TokenType.Punctuation)
+			);
+		}
+
+		[Fact]
+		public void HandleSingleQuotesInMiddleOfWord()
+		{
+			var result = sut.Tokenize("A B'C.");
+
+			Check.That(result).ContainsExactly(
+				new Token("A", 0, 0, TokenType.Word),
+				new Token("B'C", 0, 2, TokenType.Word),
+				new Token(".", 0, 5, TokenType.Punctuation)
+			);
+		}
+
+		[Fact]
+		public void HandleSingleQuotesAtEndOfWord()
+		{
+			var result = sut.Tokenize("A B'.");
+
+			Check.That(result).ContainsExactly(
+				new Token("A", 0, 0, TokenType.Word),
+				new Token("B", 0, 2, TokenType.Word),
+				new Token("'", 0, 3, TokenType.Punctuation),
+				new Token(".", 0, 4, TokenType.Punctuation)
+			);
+		}
+
+		[Fact]
 		public void UnterminatedStringCausesSyntaxException()
 		{
 			Check.ThatCode(() => sut.Tokenize("\"Unterminated").ToList())
