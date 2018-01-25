@@ -68,10 +68,14 @@ namespace TigeR.Inform7.Ast
 		}
 
 		[Fact]
-		public void RejectEmptyTokens()
+		public void DoNotMatchEmptyTokens()
 		{
-			Check.ThatCode(() => SetupMatcher(new Rule(TokenType.Word)).Match(new List<Token>()))
-				.Throws<ArgumentException>();
+			var tokens = new List<Token>();
+			var sut = SetupMatcher(new Rule(TokenType.Word));
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).IsEmpty();
 		}
 
 		[Fact]
@@ -264,7 +268,37 @@ namespace TigeR.Inform7.Ast
 			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
 		}
 
-		// todo: upper/lower case matching
+		[Fact]
+		public void MatchTooManyTokens()
+		{
+			var tokens = SetupTokens("The thing is round. The other thing is angular.");
+			var match = Match(tokens, 2, 1, 1, 1);
+			match.SetName(0, "var");
+			match.SetName(2, "value");
+
+			var sut = SetupMatcher("$var is $value.");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+
+		[Fact]
+		public void MatchCaseInvariant()
+		{
+			var tokens = SetupTokens("The thing IS round.");
+			var match = Match(tokens, 2, 1, 1, 1);
+			match.SetName(0, "var");
+			match.SetName(2, "value");
+
+			var sut = SetupMatcher("$var is $value.");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+		
 		// todo: invalid patterns
 		// todo: pattern escape char
     }

@@ -92,7 +92,7 @@ namespace TigeR.Inform7.Ast
 			}
 		}
 
-		public List<Match> Match(List<Token> tokens)
+		public List<Match> Match(IReadOnlyList<Token> tokens)
 		{
 			if (tokens == null)
 			{
@@ -101,77 +101,64 @@ namespace TigeR.Inform7.Ast
 
 			if (tokens.Count == 0)
 			{
-				throw new ArgumentException("Tokens cannot be empty", nameof(tokens));
+				return new List<Match>();
 			}
 
 			var result = new List<Match>();
-			
-			void Recurse(int tokenOffset, int ruleOffset, int groupRuleOffset, Match branch)
-			{
-				var currentToken = tokens[tokenOffset];
-				var currentRule = rules[ruleOffset];
+			var branch = new Match();
+			branch.Add(new List<Token>());
 
-				if (currentRule is Rule.RuleGroup)
-				{
-					if (groupRuleOffset < 0)
-					{
-						Recurse(tokenOffset, ruleOffset + 1, -1, branch);
-						var newBranch = branch.Duplicate();
-						Recurse(tokenOffset, ruleOffset, 0, newBranch);
-						return;
-					}
-					else
-					{
-						if (groupRuleOffset == (currentRule as Rule.RuleGroup).Rules.Count)
-						{
-							Recurse(tokenOffset, ruleOffset + 1, -1, branch);
-							return;
-						}
-
-						currentRule = (currentRule as Rule.RuleGroup).Rules[groupRuleOffset];
-					}
-				}
-
-				if (!MatchRule(currentToken, currentRule))
-				{
-					return;
-				}
-
-				if (currentRule.Name != null)
-				{
-					branch.SetName(branch.Count - 1, currentRule.Name);
-				}
-
-				branch.Last().Add(currentToken);
-				if (tokenOffset == tokens.Count - 1 && ruleOffset == rules.Count - 1)
-				{
-					result.Add(branch);
-					return;
-				}
-
-				if (currentRule.Repeatable)
-				{
-					var newBranch = branch.Duplicate();
-					Recurse(tokenOffset + 1, ruleOffset, groupRuleOffset, newBranch);
-				}
-				
-				branch.Add(new List<Token>());
-				if (groupRuleOffset < 0)
-				{
-					Recurse(tokenOffset + 1, ruleOffset + 1, -1, branch);
-				}
-				else
-				{
-					Recurse(tokenOffset + 1, ruleOffset, groupRuleOffset + 1, branch);
-				}
-			}
-			
-			var initialMatch = new Match();
-			initialMatch.Add(new List<Token>());
-
-			Recurse(0, 0, -1, initialMatch);
+			Recursive(new Queue<Token>(tokens), new Queue<Rule>(rules), branch, result);
 
 			return result;
+		}
+
+		private void Recursive(Queue<Token> tokens, Queue<Rule> rules, Match branch, List<Match> result)
+		{
+			if (rules.Peek() is Rule.RuleGroup)
+			{
+				var unrolled = new Queue<Rule>((rules.Dequeue() as Rule.RuleGroup).Rules);
+				foreach (var r in rules)
+				{
+					unrolled.Enqueue(r);
+				}
+
+				Recursive(new Queue<Token>(tokens), unrolled, branch.Duplicate(), result);
+				Recursive(tokens, rules, branch, result);
+
+				return;
+			}
+
+			var rule = rules.Peek();
+			var token = tokens.Dequeue();
+
+			if (!MatchRule(token, rule))
+			{
+				return;
+			}
+
+			if (rule.Name != null)
+			{
+				branch.SetName(branch.Count - 1, rule.Name);
+			}
+
+			branch.Last().Add(token);
+
+			if (rule.Repeatable)
+			{
+				Recursive(new Queue<Token>(tokens), new Queue<Rule>(rules), branch.Duplicate(), result);
+			}
+
+			rules.Dequeue();
+
+			if (rules.Count == 0)
+			{
+				result.Add(branch);
+				return;
+			}
+			
+			branch.Add(new List<Token>());
+			Recursive(tokens, rules, branch, result);
 		}
 
 		private bool MatchRule(Token token, Rule rule)
@@ -181,7 +168,7 @@ namespace TigeR.Inform7.Ast
 				return false;
 			}
 
-			if (rule.WantedSurface != null && token.Surface != rule.WantedSurface)
+			if (rule.WantedSurface != null && !rule.WantedSurface.Equals(token.Surface, StringComparison.OrdinalIgnoreCase))
 			{
 				return false;
 			}
