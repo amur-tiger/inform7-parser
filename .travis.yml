@@ -6,3 +6,6 @@ dist: trusty # build env (Ubuntu), .NET core needs at least this
 script:
   - dotnet restore
   - dotnet test grammar-test
+branches:
+  only:
+    - master
