@@ -39,10 +39,12 @@ namespace TigeR.Inform7.Ast
 		{
 			// "$variable is $value."
 			// "$relationshipName relates $lhs [(called $lhsName)] to $rhs [(called $rhsName)]"
+			// "The description is '$description'."
 
 			var tokenizer = new Tokenizer();
 			var tokens = tokenizer.Tokenize(pattern);
 			var variable = false;
+			var strlit = false;
 
 			rules = new List<Rule>();
 			foreach (var token in tokens)
@@ -50,6 +52,18 @@ namespace TigeR.Inform7.Ast
 				if (token.Surface == "$")
 				{
 					variable = true;
+				}
+				else if (token.Surface == "'")
+				{
+					strlit = !strlit;
+					if (strlit)
+					{
+						rules.Add(new Rule(TokenType.QuotesStart));
+					}
+					else
+					{
+						rules.Add(new Rule(TokenType.QuotesEnd));
+					}
 				}
 				else if (token.Type == TokenType.Comment)
 				{
@@ -81,11 +95,19 @@ namespace TigeR.Inform7.Ast
 				{
 					if (variable)
 					{
-						rules.Add(new Rule(TokenType.Word, true, token.Surface));
 						variable = false;
+						if (strlit)
+						{
+							rules.Add(new Rule(TokenType.Unknown, null, true, token.Surface, TokenType.QuotesEnd));
+						}
+						else
+						{
+							rules.Add(new Rule(TokenType.Word, true, token.Surface));
+						}
 					}
 					else
 					{
+						// todo string variables may end up here, check strlit
 						rules.Add(new Rule(token.Type, token.Surface));
 					}
 				}
@@ -137,6 +159,11 @@ namespace TigeR.Inform7.Ast
 				return;
 			}
 
+			if (rules.Count > 1 && tokens.Count == 0)
+			{
+				return;
+			}
+
 			if (rule.Name != null)
 			{
 				branch.SetName(branch.Count - 1, rule.Name);
@@ -163,12 +190,17 @@ namespace TigeR.Inform7.Ast
 
 		private bool MatchRule(Token token, Rule rule)
 		{
-			if (token.Type != rule.WantedType)
+			if (rule.WantedType != TokenType.Unknown && token.Type != rule.WantedType)
 			{
 				return false;
 			}
 
 			if (rule.WantedSurface != null && !rule.WantedSurface.Equals(token.Surface, StringComparison.OrdinalIgnoreCase))
+			{
+				return false;
+			}
+
+			if (rule.WantedType == TokenType.Unknown && rule.ExceptType != TokenType.Unknown && token.Type == rule.ExceptType)
 			{
 				return false;
 			}

@@ -283,7 +283,6 @@ namespace TigeR.Inform7.Ast
 			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
 		}
 
-
 		[Fact]
 		public void MatchCaseInvariant()
 		{
@@ -298,8 +297,50 @@ namespace TigeR.Inform7.Ast
 
 			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
 		}
-		
+
+		[Fact]
+		public void MatchStringLiterals()
+		{
+			var tokens = SetupTokens("A \"string literal\".");
+			var match = Match(tokens, 1, 1, 1, 1, 1);
+			match.SetName(2, "string");
+
+			var sut = SetupMatcher("A '$string'.");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+		[Fact]
+		public void MatchStringLiteralsWithVariables()
+		{
+			var tokens = SetupTokens("A \"string literal with [variable]\".");
+			var match = Match(tokens, 1, 1, 4, 1, 1);
+			match.SetName(2, "string");
+
+			var sut = SetupMatcher("A '$string'.");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+		[Fact]
+		public void MatchStringLiteralsShortOnly()
+		{
+			var tokens = SetupTokens("One \"string\". Two \"string\".");
+			var match = Match(tokens, 1, 1, 1, 1, 1);
+			match.SetName(2, "string");
+
+			var sut = SetupMatcher("One '$string'.");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
 		// todo: invalid patterns
 		// todo: pattern escape char
-    }
+	}
 }

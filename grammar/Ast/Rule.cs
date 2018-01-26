@@ -36,23 +36,25 @@ namespace TigeR.Inform7.Ast
 		public String WantedSurface { get; }
 		public bool Repeatable { get; }
 		public String Name { get; }
+		public TokenType ExceptType { get; }
 
-		public Rule(TokenType tokenType) : this(tokenType, null, false, null) { }
+		public Rule(TokenType tokenType) : this(tokenType, null, false, null, TokenType.Unknown) { }
 
-		public Rule(TokenType tokenType, string surface) : this(tokenType, surface, false, null) { }
+		public Rule(TokenType tokenType, string surface) : this(tokenType, surface, false, null, TokenType.Unknown) { }
 
-		public Rule(TokenType tokenType, string surface, string name) : this(tokenType, surface, false, name) { }
+		public Rule(TokenType tokenType, string surface, string name) : this(tokenType, surface, false, name, TokenType.Unknown) { }
 
-		public Rule(TokenType tokenType, bool repeat) : this(tokenType, null, repeat, null) { }
+		public Rule(TokenType tokenType, bool repeat) : this(tokenType, null, repeat, null, TokenType.Unknown) { }
 
-		public Rule(TokenType tokenType, bool repeat, string name) : this(tokenType, null, repeat, name) { }
+		public Rule(TokenType tokenType, bool repeat, string name) : this(tokenType, null, repeat, name, TokenType.Unknown) { }
 
-		public Rule(TokenType tokenType, string surface, bool repeat, string name)
+		public Rule(TokenType tokenType, string surface, bool repeat, string name, TokenType exceptType)
 		{
 			WantedType = tokenType;
 			WantedSurface = surface;
 			Repeatable = repeat;
 			Name = name;
+			ExceptType = exceptType;
 		}
 
 		public static Rule Optional(params Rule[] rules)
@@ -88,6 +90,13 @@ namespace TigeR.Inform7.Ast
 					.Append(", Name=\"")
 					.Append(Name)
 					.Append("\"");
+			}
+
+			if (WantedType == TokenType.Unknown && ExceptType != TokenType.Unknown)
+			{
+				builder
+					.Append(", Not ")
+					.Append(ExceptType);
 			}
 
 			builder.Append("]");
