@@ -159,17 +159,23 @@ namespace TigeR.Inform7.Ast
 				return;
 			}
 
-			if (rules.Count > 1 && tokens.Count == 0)
-			{
-				return;
-			}
-
 			if (rule.Name != null)
 			{
 				branch.SetName(branch.Count - 1, rule.Name);
 			}
 
 			branch.Last().Add(token);
+
+			if (rules.Count > 1 && tokens.Count == 0)
+			{
+				rules.Dequeue();
+				if (rules.All(r => r is Rule.RuleGroup))
+				{
+					result.Add(branch);
+				}
+
+				return;
+			}
 
 			if (rule.Repeatable)
 			{
