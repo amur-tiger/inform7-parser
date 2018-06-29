@@ -269,6 +269,19 @@ namespace TigeR.Inform7.Ast
 		}
 
 		[Fact]
+		public void HandleOptionalAsLastRule()
+		{
+			var tokens = SetupTokens("An unterminated sentence");
+			var match = Match(tokens, 1, 1, 1);
+
+			var sut = SetupMatcher("An unterminated sentence[.]");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+		[Fact]
 		public void MatchTooManyTokens()
 		{
 			var tokens = SetupTokens("The thing is round. The other thing is angular.");
