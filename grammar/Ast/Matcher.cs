@@ -137,61 +137,68 @@ namespace TigeR.Inform7.Ast
 
 		private void Recursive(Queue<Token> tokens, Queue<Rule> rules, Match branch, List<Match> result)
 		{
-			if (rules.Peek() is Rule.RuleGroup)
+			while (true)
 			{
-				var unrolled = new Queue<Rule>((rules.Dequeue() as Rule.RuleGroup).Rules);
-				foreach (var r in rules)
+				if (rules.Peek() is Rule.RuleGroup)
 				{
-					unrolled.Enqueue(r);
+					var unrolled = new Queue<Rule>((rules.Dequeue() as Rule.RuleGroup).Rules);
+					foreach (var r in rules)
+					{
+						unrolled.Enqueue(r);
+					}
+
+					Recursive(new Queue<Token>(tokens), unrolled, branch.Duplicate(), result);
+					if (rules.Count == 0)
+					{
+						branch.RemoveAt(branch.Count - 1);
+						result.Add(branch);
+						return;
+					}
+
+					continue;
 				}
 
-				Recursive(new Queue<Token>(tokens), unrolled, branch.Duplicate(), result);
-				Recursive(tokens, rules, branch, result);
+				var rule = rules.Peek();
+				var token = tokens.Dequeue();
 
-				return;
-			}
+				if (!MatchRule(token, rule))
+				{
+					return;
+				}
 
-			var rule = rules.Peek();
-			var token = tokens.Dequeue();
+				if (rule.Name != null)
+				{
+					branch.SetName(branch.Count - 1, rule.Name);
+				}
 
-			if (!MatchRule(token, rule))
-			{
-				return;
-			}
+				branch.Last().Add(token);
 
-			if (rule.Name != null)
-			{
-				branch.SetName(branch.Count - 1, rule.Name);
-			}
+				if (rules.Count > 1 && tokens.Count == 0)
+				{
+					rules.Dequeue();
+					if (rules.All(r => r is Rule.RuleGroup))
+					{
+						result.Add(branch);
+					}
 
-			branch.Last().Add(token);
+					return;
+				}
 
-			if (rules.Count > 1 && tokens.Count == 0)
-			{
+				if (rule.Repeatable)
+				{
+					Recursive(new Queue<Token>(tokens), new Queue<Rule>(rules), branch.Duplicate(), result);
+				}
+
 				rules.Dequeue();
-				if (rules.All(r => r is Rule.RuleGroup))
+
+				if (rules.Count == 0)
 				{
 					result.Add(branch);
+					return;
 				}
 
-				return;
+				branch.Add(new List<Token>());
 			}
-
-			if (rule.Repeatable)
-			{
-				Recursive(new Queue<Token>(tokens), new Queue<Rule>(rules), branch.Duplicate(), result);
-			}
-
-			rules.Dequeue();
-
-			if (rules.Count == 0)
-			{
-				result.Add(branch);
-				return;
-			}
-			
-			branch.Add(new List<Token>());
-			Recursive(tokens, rules, branch, result);
 		}
 
 		private bool MatchRule(Token token, Rule rule)

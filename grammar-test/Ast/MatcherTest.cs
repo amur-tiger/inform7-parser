@@ -127,7 +127,7 @@ namespace TigeR.Inform7.Ast
 				new Rule(TokenType.Punctuation));
 
 			var result = sut.Match(tokens);
-			
+
 			Check.That(result).Contains(
 				Match(tokens, 1, 1, 3, 1),
 				Match(tokens, 3, 1, 1, 1)
@@ -275,6 +275,21 @@ namespace TigeR.Inform7.Ast
 			var match = Match(tokens, 1, 1, 1);
 
 			var sut = SetupMatcher("An unterminated sentence[.]");
+
+			var result = sut.Match(tokens);
+
+			Check.That(result).HasOneElementOnly().Which.IsEqualTo(match);
+		}
+
+		[Fact]
+		public void HandleOptionalAsLastRuleWithTooManyTokens()
+		{
+			var tokens = SetupTokens("\"A story\" by Author\n\n");
+			var match = Match(tokens, 1, 1, 1, 1, 1);
+			match.SetName(1, "title");
+			match.SetName(4, "author");
+
+			var sut = SetupMatcher("'$title' by $author[.]");
 
 			var result = sut.Match(tokens);
 
