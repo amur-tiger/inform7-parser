@@ -48,10 +48,31 @@ namespace TigeR.Inform7.Ast
 
 			// matching may depend on previous user-defined rules: maybe make all matching user-definable (in contrast to defining new rules in code)
 			// example: Inclusion relates a thing (called X) to a thing (called Y) when Y is part of X. -> One oven is a part of every stove.
-			
-			
+
+
 			foreach (var sentence in sentences)
 			{
+				var includeMatches = matchInclude.Match(sentence);
+				if (includeMatches.Count > 0)
+				{
+					var match = includeMatches.First();
+
+					var title = new IdentifierNode();
+					title.Token.AddRange(match["title"]);
+
+					var author = new IdentifierNode();
+					author.Token.AddRange(match["author"]);
+
+					var inc = new IncludeNode();
+					inc.Token.AddRange(match[0]);
+					inc.Children.Add(title);
+					inc.Children.Add(author);
+
+					result.Children.Add(inc);
+
+					continue;
+				}
+
 				var matches = matchAssignment.Match(sentence);
 				if (matches.Count > 0)
 				{
@@ -103,8 +124,13 @@ namespace TigeR.Inform7.Ast
 			var list = new List<Token>();
 			foreach (var token in tokens)
 			{
+				if (token.Type == TokenType.Newline)
+				{
+					continue;
+				}
+
 				list.Add(token);
-				
+
 				if (token.Type == TokenType.Punctuation && (token.Surface == "." || token.Surface == ";"))
 				{
 					yield return list;

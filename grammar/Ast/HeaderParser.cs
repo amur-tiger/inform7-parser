@@ -8,20 +8,11 @@ namespace TigeR.Inform7.Ast
 {
 	internal class HeaderParser : ISubParser
 	{
-		private readonly Matcher introMatcher = new Matcher("[Version $version of] '$title' [(for $platform only)] by $author [begins here][.]");
+		private readonly Matcher titleMatcher = new Matcher("[Version $version of] '$title' [(for $platform only)] by $author [begins here][.]");
 		private readonly Matcher modestyMatcher = new Matcher("Use authorial modesty.");
 
 		public IEnumerable<Node> Parse(IEnumerator<Token> tokens)
 		{
-			var simpleIntroMatcher = new Matcher(
-				new Rule(TokenType.QuotesStart),
-				new Rule(TokenType.StringLiteral, false, "title"),
-				new Rule(TokenType.QuotesEnd),
-				new Rule(TokenType.Word, "by"),
-				new Rule(TokenType.Word, true, "author"),
-				new Rule(TokenType.Newline)
-			);
-
 			var line = new List<Token>();
 			while (tokens.MoveNext())
 			{
@@ -32,21 +23,23 @@ namespace TigeR.Inform7.Ast
 				}
 			}
 
-			var matches = simpleIntroMatcher.Match(line);
+			var matches = titleMatcher.Match(line);
 			if (matches.Count > 0)
 			{
-				var intro = new TitleStatement();
+				var match = matches[0];
 
-				var title = new StringExpressionNode();
-				title.Token.AddRange(matches[0][1]);
+				var title = new TitleStatement();
+
+				var titleString = new StringExpressionNode();
+				titleString.Token.AddRange(match["title"]);
 
 				var author = new NOTDONENODE();
-				author.Token.AddRange(matches[0][4]);
+				author.Token.AddRange(match["author"]);
 
-				intro.Children.Add(title);
-				intro.Children.Add(author);
+				title.Children.Add(titleString);
+				title.Children.Add(author);
 
-				yield return intro;
+				yield return title;
 			}
 
 
@@ -57,7 +50,7 @@ namespace TigeR.Inform7.Ast
 
 			// return
 
-			
+
 		}
 	}
 }
